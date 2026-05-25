@@ -12,7 +12,43 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    
     <style>
+        :root {
+            /* ===== COLOR PLACEHOLDERS ===== */
+            --primary-color: #1e3a8a;
+            --secondary-color: #b91c1c;
+            --accent-color: #facc15;
+            --background-color: #f1f5f9;
+            --text-color: #1e293b;
+
+            /* ===== IMAGE PLACEHOLDERS ===== */
+            --login-banner-image: url('YOUR_IMAGE_LINK_HERE');
+            --logo-image: url('YOUR_LOGO_LINK_HERE');
+        }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .custom-primary-bg {
+            background-color: var(--primary-color) !important;
+        }
+
+        .custom-secondary-bg {
+            background-color: var(--secondary-color) !important;
+        }
+
+        .custom-accent-bg {
+            background-color: var(--accent-color) !important;
+        }
+
+        .custom-login-banner {
+            background-image: var(--login-banner-image) !important;
+        }
+
         body {
             font-family: 'Lexend', sans-serif;
             background-color: #f1f5f9;
@@ -49,7 +85,7 @@
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden grid grid-cols-1 md:grid-cols-12 animate-fade-in">
             <!-- Left Banner: Police Identity Banner -->
             <div class="md:col-span-5 bg-gradient-to-br from-red-700 via-blue-900 to-slate-950 text-white p-8 flex flex-col justify-between relative overflow-hidden">
-                <div class="absolute inset-0 bg-cover bg-center opacity-10" style="background-image: url('https://images.unsplash.com/photo-1587560699334-cc4ff634909a?auto=format&fit=crop&q=80&w=800');"></div>
+                <div class="absolute inset-0 bg-cover bg-center opacity-10" style="background-image: var(--login-banner-image);"></div>
                 <div class="relative z-10 space-y-4">
                     <div class="bg-yellow-400 text-blue-900 w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-400/30">
                         <i class="fa-solid fa-shield-halved text-2xl"></i>
@@ -696,7 +732,7 @@ let currentAdminName = '';
                         apiKey: "AIzaSyDHTmYBvW2KVsqf_DSrlPLqLH5uA8ftgdI",
                         authDomain: "canhi2026.firebaseapp.com",
                         projectId: "canhi2026",
-                        storageBucket: "canhi2026.firebasestorage.app",
+                        storageBucket: "canhi2026.appspot.com",
                         messagingSenderId: "763116770789",
                         appId: "1:763116770789:web:9a734f481eb28511ad4b0c",
                         measurementId: "G-0MK7L6ZE4F"
@@ -1950,7 +1986,7 @@ if (currentUserRole === 'admin' && currentAdminSquad !== 'all') {
             apiKey: "AIzaSyDHTmYBvW2KVsqf_DSrlPLqLH5uA8ftgdI",
             authDomain: "canhi2026.firebaseapp.com",
             projectId: "canhi2026",
-            storageBucket: "canhi2026.firebasestorage.app",
+            storageBucket: "canhi2026.appspot.com",
             messagingSenderId: "763116770789",
             appId: "1:763116770789:web:9a734f481eb28511ad4b0c",
             measurementId: "G-0MK7L6ZE4F"
@@ -1961,6 +1997,18 @@ if (currentUserRole === 'admin' && currentAdminSquad !== 'all') {
 
         window.firebaseApp = app;
     </script>
+
+
+    <!-- =========================================
+         CUSTOM PLACEHOLDER GUIDE
+         =========================================
+         Chỉnh màu trong :root
+         Ví dụ:
+         --primary-color: #000000;
+
+         Đổi ảnh:
+         --login-banner-image: url('LINK_ANH');
+         ========================================= -->
 
 </body>
 </html>
