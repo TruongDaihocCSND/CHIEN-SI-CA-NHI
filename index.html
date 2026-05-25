@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sổ Đầu Bài Online - Chiến Sĩ Công An Nhí</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: #f1f5f9;
+        }
+        /* Custom scrollbar for tactical military feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Grid tactical background pattern */
+        .military-grid {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col military-grid">
+
+    <!-- SYSTEM TOAST NOTIFICATIONS CONTAINER -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- ================== LOGIN PORTAL (SCREEN 1) ================== -->
+    <div id="loginPortal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden grid grid-cols-1 md:grid-cols-12 animate-fade-in">
+            <!-- Left Banner: Police Identity Banner -->
+            <div class="md:col-span-5 bg-gradient-to-br from-red-700 via-blue-900 to-slate-950 text-white p-8 flex flex-col justify-between relative overflow-hidden">
+                <div class="absolute inset-0 bg-cover bg-center opacity-10" style="background-image: url('https://images.unsplash.com/photo-1587560699334-cc4ff634909a?auto=format&fit=crop&q=80&w=800');"></div>
+                <div class="relative z-10 space-y-4">
+                    <div class="bg-yellow-400 text-blue-900 w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-400/30">
+                        <i class="fa-solid fa-shield-halved text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-extrabold tracking-wide leading-tight">CHIẾN SĨ<br>CÔNG AN NHÍ</h2>
+                        <div class="h-1 w-16 bg-yellow-400 rounded-full mt-2"></div>
+                    </div>
+                    <p class="text-xs text-blue-200 font-light leading-relaxed">
+                        Hành trình trải nghiệm thực tế kỷ luật thép, kỹ năng sinh tồn, dũng cảm và tinh thần đồng đội quốc phòng an ninh.
+                    </p>
+                </div>
+                
+                <div class="relative z-10 mt-12 pt-6 border-t border-white/10 text-[10px] text-slate-300">
+                    <p class="font-semibold text-yellow-400">🚨 CHÚ Ý AN TOÀN & BẢO MẬT</p>
+                    <p class="mt-1">Mọi thông tin nhận xét nội bộ chỉ được chia sẻ trong phạm vi ban tổ chức và gia đình học viên.</p>
+                </div>
+            </div>
+
+            <!-- Right panel: Authentication Forms -->
+            <div class="md:col-span-7 p-8 flex flex-col justify-center bg-slate-50">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-slate-900">CỔNG THÔNG TIN TRỰC TUYẾN</h3>
+                    <p class="text-xs text-slate-500 mt-1">Vui lòng chọn vai trò để tiếp tục truy cập</p>
+                </div>
+
+                <!-- Tabs switcher -->
+                <div class="flex p-1 bg-slate-200/80 rounded-xl mb-6">
+                    <button onclick="switchLoginTab('parent')" id="tabLoginParent" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-300 bg-white text-blue-900 shadow-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-users"></i> PHỤ HUYNH / CHIẾN SĨ
+                    </button>
+                    <button onclick="switchLoginTab('admin')" id="tabLoginAdmin" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-slate-900 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-shield-halved"></i> BAN CHỈ HUY
+                    </button>
+                </div>
+
+                <!-- PARENT LOGIN FORM -->
+                <div id="formLoginParent" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5 tracking-wider">Mã Số Chiến Sĩ Nhí</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-id-card"></i>
+                            </span>
+                            <input id="parentStudentCode" type="text" placeholder="Ví dụ: CAN-001 (Xem riêng con bạn)" class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
+                        </div>
+                    </div>
+                    
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-slate-200"></div>
+                        <span class="flex-shrink mx-4 text-xs text-slate-400 uppercase font-semibold">Hoặc dùng mã chung</span>
+                        <div class="flex-grow border-t border-slate-200"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5 tracking-wider">Mã Truy Cập Toàn Chương Trình</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-key"></i>
+                            </span>
+                            <input id="parentGeneralCode" type="password" placeholder="Mã chung: 2026 (Xem cả tiểu đội)" class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+                        </div>
+                    </div>
+
+                    <button onclick="submitParentLogin()" class="w-full py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-bold text-sm shadow-md transition duration-300 flex items-center justify-center gap-2 mt-2">
+                        Truy Cập Sổ Đầu Bài <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- ADMIN/MANAGER LOGIN FORM -->
+                <div id="formLoginAdmin" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5 tracking-wider">Mã Điều Phối Viên / Quản Lý</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-user-lock"></i>
+                            </span>
+                            <input id="adminCode" type="password" placeholder="Nhập mã pin bảo mật ban quản lý (Gợi ý: 113)" class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:outline-none text-sm">
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 border border-red-100 rounded-xl p-3 text-xs text-red-800 space-y-1">
+                        <p class="font-bold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> QUYỀN HẠN SĨ QUAN NHẬP LIỆU</p>
+                        <p>Khu vực này chỉ dành cho cán bộ quản lý huấn luyện, cảnh sát điều phối lớp để ghi nhận xếp loại thi đua.</p>
+                    </div>
+
+                    <button onclick="submitAdminLogin()" class="w-full py-3 bg-red-700 hover:bg-red-600 text-white rounded-xl font-bold text-sm shadow-md transition duration-300 flex items-center justify-center gap-2 mt-2">
+                        Đăng Nhập Quản Lý <i class="fa-solid fa-right-to-bracket"></i>
+                    </button>
+                </div>
+
+                <!-- Demo Credentials Helper Alert -->
+                <div class="mt-6 p-3 bg-yellow-50 rounded-xl border border-yellow-100 text-[11px] text-amber-900">
+                    <p class="font-bold"><i class="fa-solid fa-circle-info"></i> THÔNG TIN TRUY CẬP ĐỂ TEST:</p>
+                    <ul class="list-disc list-inside mt-1 font-medium text-amber-800">
+                        <li><strong>Phụ huynh (riêng):</strong> Nhập Mã chiến sĩ là <code class="bg-amber-100 px-1 rounded">CAN-001</code></li>
+                        <li><strong>Phụ huynh (chung):</strong> Nhập Mã chung là <code class="bg-amber-100 px-1 rounded">2026</code></li>
+                        <li><strong>Ban chỉ huy (Quản lý):</strong> Nhập Mã là <code class="bg-amber-100 px-1 rounded">113</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================== MAIN APP WEBPORTAL ================== -->
+    <!-- HEADER BAR -->
+    <header class="bg-gradient-to-r from-red-700 via-blue-900 to-blue-950 text-white shadow-xl sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-yellow-400 p-2 rounded-full text-blue-900 flex items-center justify-center shadow-inner">
+                    <i class="fa-solid fa-shield-halved text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-extrabold tracking-wide">CHIẾN SĨ CÔNG AN NHÍ</h1>
+                    <p class="text-[10px] text-yellow-300 font-bold uppercase tracking-wider">Hệ thống sổ đầu bài & Nhật ký sinh hoạt trực tuyến</p>
+                </div>
+            </div>
+            
+            <!-- CURRENT USER CORNER -->
+            <div class="flex items-center space-x-2">
+                <div id="userBadge" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-800/80 text-blue-100 border border-blue-700 flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-user-check"></i>
+                    <span id="userBadgeText">Đang tải...</span>
+                </div>
+                <button onclick="logOut()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-red-600/90 hover:bg-red-500 text-white transition duration-300 flex items-center gap-1 shadow-md">
+                    <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+
+        <!-- THÔNG BÁO TỪ BAN CHỈ HUY -->
+        <section class="bg-white rounded-3xl p-5 shadow-sm border-l-8 border-red-600 flex flex-col md:flex-row items-start md:items-center gap-4">
+            <div class="bg-red-50 p-4 rounded-2xl text-red-600">
+                <i class="fa-solid fa-bullhorn text-2xl"></i>
+            </div>
+            <div class="flex-grow">
+                <h3 class="font-bold text-red-700 text-lg flex items-center gap-2">
+                    Thông báo từ Ban chỉ huy hành quân
+                    <button id="btnEditNotice" onclick="openEditNotice()" class="hidden text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded-lg transition">
+                        <i class="fa-solid fa-pen"></i> Sửa thông báo
+                    </button>
+                </h3>
+                <p id="noticeContent" class="text-slate-600 mt-1 font-medium text-sm">
+                    Chào mừng các bậc phụ huynh đến với Nhật ký Hành quân. Thông tin nhận xét tác phong và hình ảnh hoạt động của các chiến sĩ nhí sẽ được cập nhật định kỳ trước 21h00 mỗi ngày.
+                </p>
+                <span id="noticeTime" class="text-xs text-slate-400 block mt-1.5 font-semibold">Cập nhật: 21:00 Hôm nay</span>
+            </div>
+        </section>
+
+        <!-- CHUYỂN TAB CHỨC NĂNG -->
+        <div class="flex border-b border-slate-200 overflow-x-auto gap-2">
+            <button onclick="switchTab('comments')" id="tabComments" class="py-3 px-6 font-bold text-sm border-b-2 border-blue-900 text-blue-900 flex items-center gap-2 transition duration-200 whitespace-nowrap">
+                <i class="fa-solid fa-clipboard-list"></i> Sổ Đầu Bài / Nhận Xét Tác Phong
+            </button>
+            <button onclick="switchTab('gallery')" id="tabGallery" class="py-3 px-6 font-semibold text-sm border-b-2 border-transparent text-slate-500 hover:text-blue-900 flex items-center gap-2 transition duration-200 whitespace-nowrap">
+                <i class="fa-solid fa-images"></i> Hình Ảnh Sinh Hoạt
+            </button>
+            <button onclick="switchTab('sync')" id="tabSync" class="hidden py-3 px-6 font-semibold text-sm border-b-2 border-transparent text-slate-500 hover:text-blue-950 flex items-center gap-2 transition duration-200 whitespace-nowrap bg-yellow-50 text-yellow-900 rounded-t-2xl">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Lưu & Đồng Bộ Lên GitHub
+            </button>
+        </div>
+
+        <!-- ================== TAB 1: SỔ ĐẦU BÀI / NHẬN XÉT ================== -->
+        <div id="contentComments" class="space-y-6">
+            
+            <!-- PERSONALIZED STUDENT REPORT CARD (Only shown when logged in as single child) -->
+            <div id="personalStudentCard" class="hidden bg-gradient-to-br from-blue-900 via-blue-950 to-slate-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute right-0 bottom-0 opacity-5 pointer-events-none transform translate-y-6 translate-x-6">
+                    <i class="fa-solid fa-shield-halved text-[200px]"></i>
+                </div>
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/15 pb-4">
+                    <div>
+                        <span class="px-3 py-1 bg-yellow-400 text-blue-950 text-[10px] font-extrabold rounded-full uppercase tracking-wider">HỒ SƠ HỌC VIÊN CÁ NHÂN</span>
+                        <h2 id="personalStudentName" class="text-2xl font-black mt-1">Đang tải...</h2>
+                        <p class="text-xs text-blue-200 mt-1">Mã chiến sĩ: <span id="personalStudentId" class="font-bold font-mono text-yellow-300">CAN-XXX</span> | Tiểu đội: <span id="personalStudentSquad" class="font-bold">X</span></p>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="text-xs text-slate-300 uppercase tracking-wide">Xếp Loại Tác Phong Ngày</span>
+                        <span id="personalStudentRating" class="px-4 py-1.5 rounded-xl text-xs font-extrabold mt-1 text-center shadow-lg">Đang tải</span>
+                    </div>
+                </div>
+                <div class="relative z-10 mt-4">
+                    <h4 class="text-xs text-yellow-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-quote-left text-xs"></i> LỜI NHẬN XÉT CHI TIẾT CỦA ĐIỀU PHỐI VIÊN CHỈ HUY:
+                    </h4>
+                    <p id="personalStudentComment" class="mt-2 text-slate-100 text-sm leading-relaxed font-light italic">
+                        Đang tải đánh giá từ ban tổ chức...
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tìm kiếm và Lọc (Hidden or restricted when viewing single child, always shown for all view/admin) -->
+            <div id="searchFilterBox" class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Tìm kiếm chiến sĩ</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input oninput="filterData()" id="searchName" type="text" placeholder="Nhập tên hoặc mã số..." class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Lọc theo Tiểu đội</label>
+                    <select onchange="filterData()" id="filterSquad" class="w-full py-2 px-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white">
+                        <option value="all">Tất cả tiểu đội</option>
+                        <option value="1">Tiểu đội 1 (Cảnh Sát Hình Sự)</option>
+                        <option value="2">Tiểu đội 2 (Cảnh Sát Phòng Cháy)</option>
+                        <option value="3">Tiểu đội 3 (Cảnh Sát Giao Thông)</option>
+                    </select>
+                </div>
+                <div class="flex items-end justify-between gap-2">
+                    <div class="flex-grow">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Đánh giá tác phong</label>
+                        <select onchange="filterData()" id="filterRating" class="py-2 px-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white w-full">
+                            <option value="all">Tất cả xếp loại</option>
+                            <option value="Tốt">Xuất Sắc / Tốt</option>
+                            <option value="Khá">Khá / Đạt</option>
+                            <option value="Cần cố gắng">Cần cố gắng</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Nút thêm chiến sĩ (Chỉ hiện khi là Admin) -->
+                    <button id="btnAddStudent" onclick="openStudentModal()" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm px-4 py-2.5 rounded-xl transition duration-200 shadow-md flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-user-plus"></i> Thêm Chiến Sĩ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bảng hiển thị thông tin chính -->
+            <div id="studentTableSection" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-shield text-blue-900"></i> Bảng Thi Đua Tác Phong Toàn Đại Đội
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900 text-white text-xs uppercase font-bold tracking-wider">
+                                <th class="py-4 px-6 text-center w-12">STT</th>
+                                <th class="py-4 px-4 w-28 text-center">Mã số</th>
+                                <th class="py-4 px-6">Họ & Tên</th>
+                                <th class="py-4 px-4 text-center">Tiểu đội</th>
+                                <th class="py-4 px-6">Nội dung rèn luyện & Nhận xét tác phong</th>
+                                <th class="py-4 px-4 text-center w-36">Xếp loại</th>
+                                <th id="thActions" class="hidden py-4 px-6 text-center w-28">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody" class="divide-y divide-slate-100 text-sm">
+                            <!-- Dữ liệu render động bằng JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="py-3 px-6 bg-slate-50 text-xs text-slate-400 font-semibold flex justify-between">
+                    <span id="countSummary">Hiển thị 0 / 0 chiến sĩ nhí</span>
+                    <span>Tải lại trang nếu không thấy cập nhật mới</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================== TAB 2: HÌNH ẢNH HOẠT ĐỘNG ================== -->
+        <div id="contentGallery" class="hidden space-y-6">
+            <!-- Khu vực tải ảnh (Chỉ hiện khi là Admin) -->
+            <div id="adminPhotoUpload" class="hidden bg-white p-6 rounded-3xl shadow-sm border border-dashed border-blue-200">
+                <h3 class="font-bold text-blue-900 text-base mb-4 flex items-center gap-2"><i class="fa-solid fa-cloud-arrow-up"></i> Tải Lên Hình Ảnh Sinh Hoạt Mới</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-1 space-y-2">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Chọn tệp hình ảnh</label>
+                        <input type="file" id="photoFile" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                        <div id="photoPreviewContainer" class="mt-3 hidden relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-50">
+                            <img id="photoPreview" src="" class="h-44 w-full object-cover">
+                        </div>
+                    </div>
+                    <div class="md:col-span-1">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Tiêu đề ảnh / Tên hoạt động</label>
+                        <input type="text" id="photoTitle" placeholder="Ví dụ: Huấn luyện PCCC ngày 1" class="w-full py-2.5 px-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none font-medium">
+                    </div>
+                    <div class="md:col-span-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Mô tả chi tiết / Lời nhắn</label>
+                            <textarea id="photoDesc" rows="2" placeholder="Ví dụ: Các chiến sĩ nhí thực hiện rất dũng cảm..." class="w-full py-2 px-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                        </div>
+                        <button onclick="addPhoto()" class="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs py-3 px-4 rounded-xl transition duration-200 shadow-md flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Đăng ảnh sinh hoạt
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thư viện hình ảnh hiển thị cho tất cả -->
+            <div id="photoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dữ liệu render động bằng JS -->
+            </div>
+        </div>
+
+        <!-- ================== TAB 3: ĐỒNG BỘ GITHUB (CHỈ HIỆN KHI ADMIN) ================== -->
+        <div id="contentSync" class="hidden space-y-4">
+            <div class="bg-amber-50 border border-amber-200 rounded-3xl p-5 text-amber-900 text-sm">
+                <h4 class="font-extrabold flex items-center gap-2 mb-2 text-base text-amber-800">
+                    <i class="fa-solid fa-triangle-exclamation text-lg text-amber-600 animate-bounce"></i>
+                    Hướng dẫn đồng bộ lưu dữ liệu vĩnh viễn lên GitHub của bạn
+                </h4>
+                <p class="mb-2">Do GitHub Pages là một trang web tĩnh nên mọi dữ liệu bạn vừa nhập/chỉnh sửa trên web hiện tại **chỉ đang được lưu tạm thời trên trình duyệt máy tính của bạn (LocalStorage)**.</p>
+                <p class="font-bold">Để phụ huynh trên mọi thiết bị khác cũng nhìn thấy những thay đổi này, hãy làm theo các bước sau:</p>
+                <ol class="list-decimal list-inside mt-2 space-y-1.5 ml-2 font-medium">
+                    <li>Bấm vào nút <strong class="text-amber-700">"Sao chép toàn bộ mã nguồn mới"</strong> phía dưới.</li>
+                    <li>Truy cập vào trang quản lý file <code class="bg-amber-150 px-1 rounded font-mono font-semibold">index.html</code> trong repository của bạn trên GitHub.</li>
+                    <li>Bấm nút sửa tệp (icon bút chì), xóa sạch toàn bộ mã cũ đi và dán đè mã mới vừa copy vào.</li>
+                    <li>Bấm <strong class="text-amber-700">Commit changes</strong> để hoàn thành. Sau 1 phút trang web của phụ huynh sẽ tự cập nhật!</li>
+                </ol>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button onclick="copyFullCode()" class="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md transition duration-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-copy text-lg"></i> Sao Chép Toàn Bộ Mã Nguồn Mới
+                </button>
+                <button onclick="openResetConfirmModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3.5 px-6 rounded-2xl transition duration-200">
+                    Khôi phục dữ liệu gốc mẫu
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p class="text-sm font-semibold">👮‍♂️ Chương Trình Giáo Dục Kỹ Năng Sống & Trải Nghiệm Chiến Sĩ Công An Nhí 2026</p>
+            <p class="text-xs text-slate-600">Phát triển dựa trên nền tảng Trang tĩnh GitHub Pages. An toàn - Bảo mật - Đơn giản.</p>
+        </div>
+    </footer>
+
+    <!-- ================== POPUP MODALS SYSTEM ================== -->
+    
+    <!-- MODAL THÊM / SỬA HỌC VIÊN -->
+    <div id="studentModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all">
+            <div class="bg-gradient-to-r from-blue-900 to-blue-950 text-white px-6 py-4 flex justify-between items-center">
+                <h3 id="modalTitle" class="font-bold text-base">Thêm Chiến Sĩ Mới</h3>
+                <button onclick="closeStudentModal()" class="text-white/80 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="hidden" id="editIndex">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Mã số Chiến sĩ</label>
+                        <input type="text" id="modalMa" placeholder="Ví dụ: CAN-001" class="w-full py-2 px-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Họ & Tên chiến sĩ</label>
+                        <input type="text" id="modalTen" placeholder="Nguyễn Văn A" class="w-full py-2 px-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Tiểu đội tuyển quân</label>
+                        <select id="modalTieuDoi" class="w-full py-2 px-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white font-medium">
+                            <option value="1">Tiểu đội 1</option>
+                            <option value="2">Tiểu đội 2</option>
+                            <option value="3">Tiểu đội 3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Đánh giá tác phong</label>
+                        <select id="modalRating" class="w-full py-2 px-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white font-semibold">
+                            <option value="Tốt">Xuất sắc / Tốt</option>
+                            <option value="Khá">Khá / Đạt yêu cầu</option>
+                            <option value="Cần cố gắng">Cần cố gắng thêm</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Nội dung sinh hoạt & nhận xét ngày</label>
+                    <textarea id="modalNhanXet" rows="4" placeholder="Nhập tóm tắt hoạt động và lời nhận xét của bạn dành cho phụ huynh..." class="w-full py-2 px-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-slate-100">
+                <button onclick="closeStudentModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-xl transition">Hủy bỏ</button>
+                <button onclick="saveStudent()" class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-xl transition shadow-md">Lưu thông tin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HIỂN THỊ HÌNH ẢNH TO -->
+    <div id="photoZoomModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="relative max-w-3xl w-full bg-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+            <button onclick="closePhotoZoomModal()" class="absolute top-4 right-4 text-white hover:text-red-500 text-2xl z-10 bg-black/40 hover:bg-black/60 w-10 h-10 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="aspect-video w-full bg-black flex items-center justify-center">
+                <img id="zoomedPhotoImg" src="" class="w-full h-full object-contain">
+            </div>
+            <div class="p-6 text-white bg-gradient-to-t from-slate-950 to-slate-900 border-t border-slate-800">
+                <h4 id="zoomedPhotoTitle" class="text-lg font-bold text-yellow-400">Đang tải...</h4>
+                <p id="zoomedPhotoDesc" class="text-sm text-slate-300 mt-2 font-light leading-relaxed">Đang tải...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM CONFIRM DIALOG MODAL -->
+    <div id="confirmModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full border border-slate-100 transform transition-all">
+            <div class="flex items-center gap-3 text-red-600 mb-3">
+                <i class="fa-solid fa-circle-question text-3xl"></i>
+                <h3 class="font-extrabold text-lg text-slate-900">Xác Nhận Hành Động</h3>
+            </div>
+            <p id="confirmModalText" class="text-sm text-slate-600 font-medium leading-relaxed">
+                Bạn có chắc chắn muốn thực hiện hành động này hay không?
+            </p>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="btnConfirmCancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition">Hủy</button>
+                <button id="btnConfirmOk" class="px-5 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-xl transition shadow-md shadow-red-500/20">Xác Nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT GENERAL NOTICE MODAL -->
+    <div id="noticeModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-3xl p-6 shadow-2xl max-w-lg w-full border border-slate-100">
+            <h3 class="font-extrabold text-lg text-slate-900 flex items-center gap-2 mb-4"><i class="fa-solid fa-bullhorn text-red-600"></i> Sửa Thông Báo Chung</h3>
+            <textarea id="modalNoticeText" rows="4" class="w-full p-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-red-500 focus:outline-none font-medium"></textarea>
+            <div class="flex justify-end gap-3 mt-4">
+                <button onclick="closeEditNotice()" class="px-4 py-2 bg-slate-150 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl transition">Hủy</button>
+                <button onclick="saveNotice()" class="px-5 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm font-bold rounded-xl transition shadow-md">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================== SCRIPTS & APPLICATION LOGIC ================== -->
+    <script>
+        // === DỮ LIỆU BAN ĐẦU (Nếu không có trong localStorage, hệ thống sẽ sử dụng dữ liệu này) ===
+        const DEFAULT_STUDENTS = [
+            { ma: "CAN-001", ten: "Lê Minh Khôi", tieuDoi: "1", nhanXet: "Sáng: Tập trung đúng giờ, nghiêm túc tập luyện điều lệnh. Chiều: Thực hiện xuất sắc thử thách thoát nạn đám khói dầy đặc. Tác phong rất nhanh nhẹn.", rating: "Tốt" },
+            { ma: "CAN-002", ten: "Nguyễn Hà My", tieuDoi: "1", nhanXet: "Tham gia hăng hái hoạt động tập thể. Chăn màn gấp ngăn nắp tự giác. Còn hơi rụt rè khi trả lời câu hỏi lý thuyết nhưng thực hành rất cố gắng.", rating: "Khá" },
+            { ma: "CAN-003", ten: "Phạm Gia Bảo", tieuDoi: "2", nhanXet: "Sáng: Đi trễ 5 phút khi tập hợp quân số do thức dậy muộn. Đã được nhắc nhở nhẹ nhàng. Chiều: Tham gia huấn luyện chữa cháy tích cực, dũng cảm.", rating: "Cần cố gắng" },
+            { ma: "CAN-004", ten: "Trần Bảo Nam", tieuDoi: "2", nhanXet: "Gấp chăn vuông góc như quân đội. Có tinh thần tự quản rất cao, giúp đỡ các đồng đội cùng tiểu đội chỉnh sửa trang phục gọn gàng trước giờ chào cờ.", rating: "Tốt" },
+            { ma: "CAN-005", ten: "Vũ Khánh Linh", tieuDoi: "3", nhanXet: "Tiếp thu nhanh lý thuyết sơ cấp cứu thương. Thực hành băng bó vết thương cho bạn khéo léo. Tác phong ăn uống gọn gàng, dọn dẹp sạch sẽ.", rating: "Tốt" }
+        ];
+
+        const DEFAULT_PHOTOS = [
+            { id: 1, image: "https://images.unsplash.com/photo-1587560699334-cc4ff634909a?auto=format&fit=crop&q=80&w=800", title: "Lễ xuất quân chiến sĩ nhí", desc: "Giây phút trang nghiêm của lễ tuyên thệ tại quảng trường chính của khóa huấn luyện." },
+            { id: 2, image: "https://images.unsplash.com/photo-1595246140625-573b715d11dc?auto=format&fit=crop&q=80&w=800", title: "Thực hành dập tắt đám cháy giả định", desc: "Các em được hướng dẫn kỹ năng cầm vòi phun chữa cháy và kiểm soát ngọn lửa một cách an toàn." }
+        ];
+
+        const DEFAULT_NOTICE = "Chào mừng các bậc phụ huynh đến với Nhật ký Hành quân. Thông tin nhận xét tác phong và hình ảnh hoạt động của các chiến sĩ nhí sẽ được cập nhật định kỳ trước 21h00 mỗi ngày.";
+
+        // Khởi tạo các biến dữ liệu trạng thái
+        let students = JSON.parse(localStorage.getItem('police_students')) || DEFAULT_STUDENTS;
+        let photos = JSON.parse(localStorage.getItem('police_photos')) || DEFAULT_PHOTOS;
+        let notice = localStorage.getItem('police_notice') || DEFAULT_NOTICE;
+        
+        // Quản lý trạng thái phân quyền đăng nhập
+        // Có 3 loại: 
+        // 1. null (Chưa đăng nhập)
+        // 2. 'admin' (Ban chỉ huy - Đầy đủ quyền)
+        // 3. 'parent_general' (Phụ huynh chung - Xem toàn bộ, không có nút sửa)
+        // 4. 'parent_specific' (Phụ huynh riêng - Chỉ xem 1 con, không xem người khác)
+        let currentUserRole = null; 
+        let targetStudentCode = null; // Dành riêng cho parent_specific
+
+        // Khởi động trang web
+        window.onload = function() {
+            // Kiểm tra trạng thái đăng nhập lưu sẵn trong Session hoặc LocalStorage
+            const storedRole = localStorage.getItem('police_session_role');
+            const storedTarget = localStorage.getItem('police_session_target');
+            
+            if (storedRole) {
+                currentUserRole = storedRole;
+                targetStudentCode = storedTarget;
+                document.getElementById('loginPortal').classList.add('hidden');
+                initDashboard();
+            } else {
+                document.getElementById('loginPortal').classList.remove('hidden');
+            }
+
+            // Xử lý preview ảnh khi chọn file trong Admin
+            document.getElementById('photoFile').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('photoPreview').src = event.target.result;
+                        document.getElementById('photoPreviewContainer').classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        };
+
+        // --- HÀM TẠO THÔNG BÁO TOAST NỘI BỘ (Thay thế alert) ---
+        function showToast(title, text, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgClass = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-700' : 'bg-blue-900';
+            const icon = type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info';
+            
+            toast.className = `${bgClass} text-white px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3 w-80 max-w-full pointer-events-auto transition duration-300 transform translate-x-10 opacity-0`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} text-lg mt-0.5"></i>
+                <div class="flex-grow">
+                    <h5 class="font-bold text-sm tracking-wide">${title}</h5>
+                    <p class="text-xs text-white/90 mt-0.5">${text}</p>
+                </div>
+                <button class="text-white/60 hover:text-white" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => {
+                toast.classList.remove('translate-x-10', 'opacity-0');
+            }, 50);
+
+            // Auto dismiss after 4.5s
+            setTimeout(() => {
+                toast.classList.add('translate-x-10', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4500);
+        }
+
+        // --- HÀM THỰC HIỆN ĐỐI THOẠI CONFIRM NỘI BỘ (Thay thế confirm) ---
+        function customConfirm(text, onConfirm) {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('confirmModalText').innerText = text;
+            modal.classList.remove('hidden');
+            
+            const btnOk = document.getElementById('btnConfirmOk');
+            const btnCancel = document.getElementById('btnConfirmCancel');
+            
+            // Reset listeners
+            const cleanUp = () => {
+                modal.classList.add('hidden');
+            };
+            
+            btnOk.onclick = function() {
+                onConfirm();
+                cleanUp();
+            };
+            btnCancel.onclick = function() {
+                cleanUp();
+            };
+        }
+
+        // ================== LOGIC ĐĂNG NHẬP / CHUYỂN TAB CỔNG ĐĂNG NHẬP ==================
+        function switchLoginTab(tab) {
+            const tabParent = document.getElementById('tabLoginParent');
+            const tabAdmin = document.getElementById('tabLoginAdmin');
+            const formParent = document.getElementById('formLoginParent');
+            const formAdmin = document.getElementById('formLoginAdmin');
+
+            if (tab === 'parent') {
+                tabParent.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-300 bg-white text-blue-900 shadow-sm flex items-center justify-center gap-2";
+                tabAdmin.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-slate-900 flex items-center justify-center gap-2";
+                formParent.classList.remove('hidden');
+                formAdmin.classList.add('hidden');
+            } else {
+                tabAdmin.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-300 bg-white text-red-900 shadow-sm flex items-center justify-center gap-2";
+                tabParent.className = "flex-1 py-2 text-xs font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-slate-900 flex items-center justify-center gap-2";
+                formAdmin.classList.remove('hidden');
+                formParent.classList.add('hidden');
+            }
+        }
+
+        // Đăng nhập cho Phụ huynh
+        function submitParentLogin() {
+            const studentCode = document.getElementById('parentStudentCode').value.trim().toUpperCase();
+            const generalCode = document.getElementById('parentGeneralCode').value.trim();
+
+            if (!studentCode && !generalCode) {
+                showToast("Lỗi nhập liệu", "Vui lòng nhập Mã số chiến sĩ hoặc Mã truy cập chung!", "error");
+                return;
+            }
+
+            if (studentCode) {
+                // Kiểm tra xem mã chiến sĩ có tồn tại trong danh sách không
+                const foundStudent = students.find(st => st.ma.toUpperCase() === studentCode);
+                if (foundStudent) {
+                    currentUserRole = 'parent_specific';
+                    targetStudentCode = studentCode;
+                    saveSessionToStorage();
+                    document.getElementById('loginPortal').classList.add('hidden');
+                    initDashboard();
+                    showToast("Xin chào phụ huynh!", `Chào mừng phụ huynh chiến sĩ ${foundStudent.ten} đã vào sổ đầu bài.`, "success");
+                } else {
+                    showToast("Không tìm thấy chiến sĩ", "Mã số chiến sĩ nhí này không đúng hoặc chưa được khởi tạo!", "error");
+                }
+            } else if (generalCode) {
+                if (generalCode === '2026') {
+                    currentUserRole = 'parent_general';
+                    targetStudentCode = null;
+                    saveSessionToStorage();
+                    document.getElementById('loginPortal').classList.add('hidden');
+                    initDashboard();
+                    showToast("Chào Phụ Huynh", "Đăng nhập thành công với mã truy cập đại đội chung.", "success");
+                } else {
+                    showToast("Sai mã truy cập", "Mã truy cập chung của Đại Đội không đúng!", "error");
+                }
+            }
+        }
+
+        // Đăng nhập cho Ban Chỉ Huy (Quản lý)
+        function submitAdminLogin() {
+            const code = document.getElementById('adminCode').value.trim();
+            if (code === '113') {
+                currentUserRole = 'admin';
+                targetStudentCode = null;
+                saveSessionToStorage();
+                document.getElementById('loginPortal').classList.add('hidden');
+                initDashboard();
+                showToast("Báo Cáo Sĩ Quan!", "Đăng nhập thành công quyền Quản lý & Nhận xét viên.", "success");
+            } else {
+                showToast("Sai mã sĩ quan", "Mã pin bảo mật của Ban chỉ huy không chính xác!", "error");
+            }
+        }
+
+        // Đăng xuất
+        function logOut() {
+            customConfirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống Sổ Đầu Bài không?", function() {
+                currentUserRole = null;
+                targetStudentCode = null;
+                localStorage.removeItem('police_session_role');
+                localStorage.removeItem('police_session_target');
+                document.getElementById('loginPortal').classList.remove('hidden');
+                
+                // Clear inputs
+                document.getElementById('parentStudentCode').value = '';
+                document.getElementById('parentGeneralCode').value = '';
+                document.getElementById('adminCode').value = '';
+            });
+        }
+
+        // Lưu trạng thái đăng nhập session
+        function saveSessionToStorage() {
+            localStorage.setItem('police_session_role', currentUserRole);
+            if (targetStudentCode) {
+                localStorage.setItem('police_session_target', targetStudentCode);
+            } else {
+                localStorage.removeItem('police_session_target');
+            }
+        }
+
+        // ================== KHỞI TẠO DASHBOARD CHÍNH ==================
+        function initDashboard() {
+            renderStudents();
+            renderPhotos();
+            document.getElementById('noticeContent').innerText = notice;
+            applyRoleInterface();
+        }
+
+        // Áp dụng bộ giao diện dựa vào phân quyền role
+        function applyRoleInterface() {
+            const badgeText = document.getElementById('userBadgeText');
+            const badge = document.getElementById('userBadge');
+            const btnAddStudent = document.getElementById('btnAddStudent');
+            const thActions = document.getElementById('thActions');
+            const actionCells = document.querySelectorAll('.action-cell');
+            const btnEditNotice = document.getElementById('btnEditNotice');
+            const adminPhotoUpload = document.getElementById('adminPhotoUpload');
+            const adminPhotoActions = document.querySelectorAll('.admin-photo-action');
+            const tabSync = document.getElementById('tabSync');
+            
+            const personalCard = document.getElementById('personalStudentCard');
+            const searchFilterBox = document.getElementById('searchFilterBox');
+            const studentTableSection = document.getElementById('studentTableSection');
+
+            if (currentUserRole === 'admin') {
+                // SĨ QUAN QUẢN LÝ
+                badgeText.innerText = "Ban Chỉ Huy (Mã 113)";
+                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-red-800 text-red-100 border border-red-700 animate-pulse flex items-center gap-1.5 shadow-sm";
+                
+                btnAddStudent.classList.remove('hidden');
+                thActions.classList.remove('hidden');
+                btnEditNotice.classList.remove('hidden');
+                adminPhotoUpload.classList.remove('hidden');
+                tabSync.classList.remove('hidden');
+                
+                personalCard.classList.add('hidden');
+                searchFilterBox.classList.remove('hidden');
+                studentTableSection.classList.remove('hidden');
+            } 
+            else if (currentUserRole === 'parent_general') {
+                // PHỤ HUYNH CHUNG
+                badgeText.innerText = "Gia đình Đại Đội (2026)";
+                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-850 text-blue-100 border border-blue-700 flex items-center gap-1.5 shadow-sm";
+                
+                btnAddStudent.classList.add('hidden');
+                thActions.classList.add('hidden');
+                btnEditNotice.classList.add('hidden');
+                adminPhotoUpload.classList.add('hidden');
+                tabSync.classList.add('hidden');
+                
+                personalCard.classList.add('hidden');
+                searchFilterBox.classList.remove('hidden');
+                studentTableSection.classList.remove('hidden');
+            }
+            else if (currentUserRole === 'parent_specific') {
+                // PHỤ HUYNH CHỈ XEM 1 CON
+                const targetStudent = students.find(st => st.ma === targetStudentCode);
+                badgeText.innerText = `Phụ huynh: ${targetStudent ? targetStudent.ten : 'Chiến sĩ'}`;
+                badge.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-800 text-emerald-100 border border-emerald-700 flex items-center gap-1.5 shadow-sm";
+                
+                btnAddStudent.classList.add('hidden');
+                thActions.classList.add('hidden');
+                btnEditNotice.classList.add('hidden');
+                adminPhotoUpload.classList.add('hidden');
+                tabSync.classList.add('hidden');
+                
+                // Hiển thị khung nhận xét cá nhân
+                personalCard.classList.remove('hidden');
+                if (targetStudent) {
+                    document.getElementById('personalStudentName').innerText = targetStudent.ten;
+                    document.getElementById('personalStudentId').innerText = targetStudent.ma;
+                    document.getElementById('personalStudentSquad').innerText = targetStudent.tieuDoi;
+                    document.getElementById('personalStudentComment').innerText = targetStudent.nhanXet;
+                    
+                    const ratingSpan = document.getElementById('personalStudentRating');
+                    ratingSpan.innerText = targetStudent.rating;
+                    if(targetStudent.rating === 'Tốt') {
+                        ratingSpan.className = "px-4 py-1.5 rounded-xl text-xs font-extrabold mt-1 text-center shadow-lg bg-emerald-500 text-white";
+                    } else if(targetStudent.rating === 'Khá') {
+                        ratingSpan.className = "px-4 py-1.5 rounded-xl text-xs font-extrabold mt-1 text-center shadow-lg bg-blue-500 text-white";
+                    } else {
+                        ratingSpan.className = "px-4 py-1.5 rounded-xl text-xs font-extrabold mt-1 text-center shadow-lg bg-amber-500 text-white";
+                    }
+                }
+                
+                // Ẩn bảng lớn và hộp lọc cho an toàn riêng tư
+                searchFilterBox.classList.add('hidden');
+                studentTableSection.classList.add('hidden');
+            }
+        }
+
+        // ================== QUẢN LÝ TABS ==================
+        let activeTab = 'comments';
+        function switchTab(tabName) {
+            activeTab = tabName;
+            document.getElementById('contentComments').classList.add('hidden');
+            document.getElementById('contentGallery').classList.add('hidden');
+            document.getElementById('contentSync').classList.add('hidden');
+
+            document.getElementById('tabComments').className = "py-3 px-6 font-semibold text-sm border-b-2 border-transparent text-slate-500 hover:text-blue-900 flex items-center gap-2 transition duration-200 whitespace-nowrap";
+            document.getElementById('tabGallery').className = "py-3 px-6 font-semibold text-sm border-b-2 border-transparent text-slate-500 hover:text-blue-900 flex items-center gap-2 transition duration-200 whitespace-nowrap";
+            document.getElementById('tabSync').className = "py-3 px-6 font-semibold text-sm border-b-2 border-transparent text-slate-500 hover:text-blue-950 flex items-center gap-2 transition duration-200 whitespace-nowrap bg-yellow-50 text-yellow-900 rounded-t-2xl";
+
+            if (tabName === 'comments') {
+                document.getElementById('contentComments').classList.remove('hidden');
+                document.getElementById('tabComments').className = "py-3 px-6 font-bold text-sm border-b-2 border-blue-900 text-blue-900 flex items-center gap-2 transition duration-200 whitespace-nowrap";
+            } else if (tabName === 'gallery') {
+                document.getElementById('contentGallery').classList.remove('hidden');
+                document.getElementById('tabGallery').className = "py-3 px-6 font-bold text-sm border-b-2 border-blue-900 text-blue-900 flex items-center gap-2 transition duration-200 whitespace-nowrap";
+            } else if (tabName === 'sync') {
+                document.getElementById('contentSync').classList.remove('hidden');
+                document.getElementById('tabSync').className = "py-3 px-6 font-bold text-sm border-b-2 border-yellow-600 text-yellow-900 flex items-center gap-2 transition duration-200 whitespace-nowrap bg-yellow-100 rounded-t-2xl";
+            }
+        }
+
+        // ================== RENDERING LOGICS ==================
+        function renderStudents(dataToRender = null) {
+            const list = dataToRender || students;
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+
+            list.forEach((st, idx) => {
+                let badgeColor = '';
+                if(st.rating === 'Tốt') badgeColor = 'bg-emerald-100 text-emerald-800 border border-emerald-300';
+                else if(st.rating === 'Khá') badgeColor = 'bg-blue-100 text-blue-800 border border-blue-300';
+                else badgeColor = 'bg-amber-100 text-amber-800 border border-amber-300';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition duration-150';
+                tr.innerHTML = `
+                    <td class="py-4 px-6 text-center text-slate-500 font-semibold">${idx + 1}</td>
+                    <td class="py-4 px-4 font-mono font-bold text-blue-900 text-center">${st.ma}</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">${st.ten}</td>
+                    <td class="py-4 px-4 text-center">
+                        <span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg font-bold text-xs border">Tiểu đội ${st.tieuDoi}</span>
+                    </td>
+                    <td class="py-4 px-6 text-slate-600 leading-relaxed max-w-md break-words">
+                        ${st.nhanXet}
+                    </td>
+                    <td class="py-4 px-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold ${badgeColor}">${st.rating}</span>
+                    </td>
+                    <td class="action-cell hidden py-4 px-6 text-center space-x-1 whitespace-nowrap">
+                        <button onclick="editStudent(${idx})" class="p-1.5 text-blue-600 hover:text-white hover:bg-blue-600 rounded-lg transition duration-150" title="Sửa">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deleteStudent(${idx})" class="p-1.5 text-red-600 hover:text-white hover:bg-red-600 rounded-lg transition duration-150" title="Xóa">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('countSummary').innerText = `Hiển thị ${list.length} / ${students.length} chiến sĩ nhí`;
+            
+            // Apply current view settings
+            if (currentUserRole === 'admin') {
+                const actCells = document.querySelectorAll('.action-cell');
+                actCells.forEach(cell => cell.classList.remove('hidden'));
+                document.getElementById('thActions').classList.remove('hidden');
+            } else {
+                const actCells = document.querySelectorAll('.action-cell');
+                actCells.forEach(cell => cell.classList.add('hidden'));
+                document.getElementById('thActions').classList.add('hidden');
+            }
+        }
+
+        // Render bộ ảnh hoạt động
+        function renderPhotos() {
+            const grid = document.getElementById('photoGrid');
+            grid.innerHTML = '';
+
+            if (photos.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-400">
+                        <i class="fa-regular fa-image text-5xl mb-3 animate-pulse"></i>
+                        <p class="font-bold">Chưa có hình ảnh hoạt động nào được tải lên.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            photos.forEach((ph, idx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 flex flex-col group cursor-pointer';
+                card.onclick = function(e) {
+                    // Prevent trigger open zoom on clicking delete button
+                    if (!e.target.closest('.admin-photo-action')) {
+                        openPhotoZoomModal(ph.image, ph.title, ph.desc);
+                    }
+                };
+                card.innerHTML = `
+                    <div class="relative overflow-hidden h-52 bg-slate-100">
+                        <img src="${ph.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <button onclick="deletePhoto(${idx})" class="admin-photo-action hidden absolute top-3 right-3 bg-red-600/90 text-white p-2 rounded-full hover:bg-red-600 shadow-md transition">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-900 group-hover:text-blue-900 transition text-base">${ph.title}</h4>
+                            <p class="text-xs text-slate-500 mt-2 leading-relaxed font-light">${ph.desc}</p>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            if (currentUserRole === 'admin') {
+                document.querySelectorAll('.admin-photo-action').forEach(btn => btn.classList.remove('hidden'));
+            } else {
+                document.querySelectorAll('.admin-photo-action').forEach(btn => btn.classList.add('hidden'));
+            }
+        }
+
+        // Lọc thông tin bảng thi đua
+        function filterData() {
+            const search = document.getElementById('searchName').value.toLowerCase().trim();
+            const squad = document.getElementById('filterSquad').value;
+            const rating = document.getElementById('filterRating').value;
+
+            const filtered = students.filter(st => {
+                const matchSearch = st.ten.toLowerCase().includes(search) || st.ma.toLowerCase().includes(search);
+                const matchSquad = squad === 'all' || st.tieuDoi === squad;
+                const matchRating = rating === 'all' || st.rating === rating;
+                return matchSearch && matchSquad && matchRating;
+            });
+
+            renderStudents(filtered);
+        }
+
+        // ================== CÁC HOẠT ĐỘNG BAN BIÊN TẬP / ADMIN ==================
+        
+        // Mở popup cập nhật thông báo của Ban chỉ huy
+        function openEditNotice() {
+            document.getElementById('modalNoticeText').value = notice;
+            document.getElementById('noticeModal').classList.remove('hidden');
+        }
+
+        function closeEditNotice() {
+            document.getElementById('noticeModal').classList.add('hidden');
+        }
+
+        function saveNotice() {
+            const val = document.getElementById('modalNoticeText').value.trim();
+            if (val) {
+                notice = val;
+                localStorage.setItem('police_notice', notice);
+                document.getElementById('noticeContent').innerText = notice;
+                closeEditNotice();
+                showToast("Cập nhật thông báo", "Thông báo từ Ban chỉ huy đã được lưu.", "success");
+            }
+        }
+
+        // Sổ học viên Modal (Thêm / Sửa)
+        function openStudentModal(index = -1) {
+            const modal = document.getElementById('studentModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (index > -1) {
+                title.innerText = "Cập Nhật Thông Tin Chiến Sĩ";
+                document.getElementById('editIndex').value = index;
+                document.getElementById('modalMa').value = students[index].ma;
+                document.getElementById('modalTen').value = students[index].ten;
+                document.getElementById('modalTieuDoi').value = students[index].tieuDoi;
+                document.getElementById('modalRating').value = students[index].rating;
+                document.getElementById('modalNhanXet').value = students[index].nhanXet;
+            } else {
+                title.innerText = "Thêm Chiến Sĩ Mới";
+                document.getElementById('editIndex').value = -1;
+                document.getElementById('modalMa').value = "CAN-" + String(students.length + 1).padStart(3, '0');
+                document.getElementById('modalTen').value = "";
+                document.getElementById('modalTieuDoi').value = "1";
+                document.getElementById('modalRating').value = "Tốt";
+                document.getElementById('modalNhanXet').value = "";
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeStudentModal() {
+            document.getElementById('studentModal').classList.add('hidden');
+        }
+
+        // Ghi danh / Cập nhật sinh viên
+        function saveStudent() {
+            const index = parseInt(document.getElementById('editIndex').value);
+            const ma = document.getElementById('modalMa').value.trim();
+            const ten = document.getElementById('modalTen').value.trim();
+            const tieuDoi = document.getElementById('modalTieuDoi').value;
+            const rating = document.getElementById('modalRating').value;
+            const nhanXet = document.getElementById('modalNhanXet').value.trim();
+
+            if (!ma || !ten || !nhanXet) {
+                showToast("Lỗi nhập thiếu", "Vui lòng điền đầy đủ Mã, Họ tên và Nhận xét!", "error");
+                return;
+            }
+
+            const studentObj = { ma, ten, tieuDoi, nhanXet, rating };
+
+            if (index > -1) {
+                students[index] = studentObj;
+                showToast("Thành công", `Đã cập nhật thông tin của chiến sĩ ${ten}`, "success");
+            } else {
+                students.push(studentObj);
+                showToast("Thêm mới", `Đã lưu danh chiến sĩ mới ${ten} vào sổ đầu bài`, "success");
+            }
+
+            saveToStorage();
+            renderStudents();
+            closeStudentModal();
+        }
+
+        function editStudent(index) {
+            openStudentModal(index);
+        }
+
+        function deleteStudent(index) {
+            customConfirm(`Bạn có chắc chắn muốn loại bỏ chiến sĩ ${students[index].ten} khỏi sổ thi đua?`, function() {
+                const name = students[index].ten;
+                students.splice(index, 1);
+                saveToStorage();
+                renderStudents();
+                showToast("Đã xóa", `Đã xóa chiến sĩ ${name} ra khỏi sổ đầu bài`, "success");
+            });
+        }
+
+        // Quản lý Album hình ảnh sinh hoạt
+        function addPhoto() {
+            const fileInput = document.getElementById('photoFile');
+            const titleInput = document.getElementById('photoTitle');
+            const descInput = document.getElementById('photoDesc');
+
+            if (!fileInput.files[0]) {
+                showToast("Thiếu tệp tin", "Vui lòng đính kèm hình ảnh hoạt động!", "error");
+                return;
+            }
+            if (!titleInput.value.trim() || !descInput.value.trim()) {
+                showToast("Thiếu thông tin", "Vui lòng điền đầy đủ Tiêu đề và Mô tả hoạt động!", "error");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newPhoto = {
+                    id: Date.now(),
+                    image: e.target.result,
+                    title: titleInput.value.trim(),
+                    desc: descInput.value.trim()
+                };
+
+                photos.unshift(newPhoto); // Đưa ảnh mới nhất lên đầu
+                saveToStorage();
+                renderPhotos();
+
+                // Reset Form
+                fileInput.value = '';
+                titleInput.value = '';
+                descInput.value = '';
+                document.getElementById('photoPreviewContainer').classList.add('hidden');
+                showToast("Tải ảnh thành công", "Hình ảnh sinh hoạt vừa được thêm vào thư viện công cộng.", "success");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function deletePhoto(index) {
+            customConfirm(`Bạn có chắc muốn xóa vĩnh viễn hình ảnh hoạt động này?`, function() {
+                photos.splice(index, 1);
+                saveToStorage();
+                renderPhotos();
+                showToast("Đã xóa ảnh", "Hình ảnh rèn luyện đã được rút khỏi thư viện.", "success");
+            });
+        }
+
+        // Lưu thông tin vĩnh viễn trong LocalStorage
+        function saveToStorage() {
+            localStorage.setItem('police_students', JSON.stringify(students));
+            localStorage.setItem('police_photos', JSON.stringify(photos));
+        }
+
+        // ================== ZOOM ẢNH MODAL ==================
+        function openPhotoZoomModal(image, title, desc) {
+            document.getElementById('zoomedPhotoImg').src = image;
+            document.getElementById('zoomedPhotoTitle').innerText = title;
+            document.getElementById('zoomedPhotoDesc').innerText = desc;
+            document.getElementById('photoZoomModal').classList.remove('hidden');
+        }
+
+        function closePhotoZoomModal() {
+            document.getElementById('photoZoomModal').classList.add('hidden');
+        }
+
+        // ================== CODESYNC TO GITHUB PAGES SYSTEM ==================
+        function copyFullCode() {
+            let currentHTML = document.documentElement.outerHTML;
+            
+            const studentsString = JSON.stringify(students, null, 12);
+            const photosString = JSON.stringify(photos, null, 12);
+            const noticeString = JSON.stringify(notice);
+
+            // Tìm vị trí của DEFAULT_STUDENTS, DEFAULT_PHOTOS, DEFAULT_NOTICE cũ trong code và thay bằng dữ liệu mới
+            currentHTML = currentHTML.replace(/const DEFAULT_STUDENTS = \[\s*[\s\S]*?\n\s*\];/g, `const DEFAULT_STUDENTS = ${studentsString};`);
+            currentHTML = currentHTML.replace(/const DEFAULT_PHOTOS = \[\s*[\s\S]*?\n\s*\];/g, `const DEFAULT_PHOTOS = ${photosString};`);
+            currentHTML = currentHTML.replace(/const DEFAULT_NOTICE = "[\s\S]*?";/g, `const DEFAULT_NOTICE = ${noticeString};`);
+
+            const dummy = document.createElement('textarea');
+            document.body.appendChild(dummy);
+            dummy.value = "<!DOCTYPE html>\n<html lang=\"vi\">\n" + currentHTML + "\n</html>";
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+
+            showToast("Đã sao chép mã nguồn!", "Mã trang tĩnh mới đã ở trong clipboard. Hãy dán đè vào index.html trên Github của bạn nhé.", "info");
+        }
+
+        function openResetConfirmModal() {
+            customConfirm("Hành động này sẽ xóa toàn bộ các nhận xét và ảnh bạn vừa tải lên để quay về dữ liệu mẫu gốc. Bạn có chắc chắn không?", function() {
+                localStorage.removeItem('police_students');
+                localStorage.removeItem('police_photos');
+                localStorage.removeItem('police_notice');
+                students = [...DEFAULT_STUDENTS];
+                photos = [...DEFAULT_PHOTOS];
+                notice = DEFAULT_NOTICE;
+                
+                document.getElementById('noticeContent').innerText = notice;
+                renderStudents();
+                renderPhotos();
+                applyRoleInterface();
+                showToast("Khôi phục thành công", "Đã thiết lập lại dữ liệu mẫu gốc ban đầu.", "success");
+            });
+        }
+    </script>
+</body>
+</html>
