@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sổ Đầu Bài Online - Chiến Sĩ Công An Nhí</title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+</script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -95,7 +96,9 @@
                             </span>
                             <input id="parentStudentCode" type="text" placeholder="Ví dụ: CAN-001 (Xem riêng con bạn)" class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm font-medium">
                         </div>
-                    </div>                
+                    </div>
+                    
+                    
                     <button onclick="submitParentLogin()" class="w-full py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-bold text-sm shadow-md transition duration-300 flex items-center justify-center gap-2 mt-2">
                         Truy Cập Sổ Đầu Bài <i class="fa-solid fa-arrow-right"></i>
                     </button>
@@ -128,7 +131,7 @@
                     <p class="font-bold"><i class="fa-solid fa-circle-info"></i> THÔNG TIN TRUY CẬP ĐỂ TEST:</p>
                     <ul class="list-disc list-inside mt-1 font-medium text-amber-800">
                         <li><strong>Phụ huynh (riêng):</strong> Nhập Mã chiến sĩ là <code class="bg-amber-100 px-1 rounded">CAN-001</code></li>
-                        <li><strong>Phụ huynh (chung):</strong> Nhập Mã chung là <code class="bg-amber-100 px-1 rounded">2026</code></li>
+                        
                         <li><strong>Ban chỉ huy (Quản lý):</strong> Nhập Mã là <code class="bg-amber-100 px-1 rounded">113</code></li>
                     </ul>
                 </div>
@@ -489,13 +492,17 @@
                 <!-- Chọn ngày chỉnh sửa để không đè dữ liệu của nhau -->
                 <div class="bg-blue-50 border border-blue-100 rounded-xl p-3">
                     <label class="block text-xs font-bold text-blue-900 uppercase mb-1.5">Chọn ngày muốn ghi nhận xét</label>
-                    <select id="modalDay" onchange="onModalDayChange()" class="w-full py-2 px-3 border border-blue-200 rounded-lg text-sm font-bold bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="Ngày 1">Ngày 1</option>
-                        <option value="Ngày 2">Ngày 2</option>
-                        <option value="Ngày 3">Ngày 3</option>
-                        <option value="Ngày 4">Ngày 4</option>
-                        <option value="Ngày 5">Ngày 5</option>
-                    </select>
+                    
+<input
+    type="text"
+    id="modalDay"
+    placeholder="Ví dụ: 26/05/2026 hoặc Ngày huấn luyện 1"
+    class="border rounded px-3 py-2 w-full text-sm"
+/>
+
+
+
+
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -657,8 +664,10 @@
         let photos = JSON.parse(localStorage.getItem('police_photos')) || DEFAULT_PHOTOS;
         let notice = localStorage.getItem('police_notice') || DEFAULT_NOTICE;
         
-        let currentUserRole = null; 
-        let targetStudentCode = null; // Dành riêng cho parent_specific
+        let currentUserRole = null;
+let targetStudentCode = null;
+let currentAdminSquad = 'all';
+let currentAdminName = '';
         let activePhotoCategory = 'all'; // Lưu danh mục ảnh hiện tại đang lọc
 
         // Khởi tạo Firebase Firestore biến toàn cục
@@ -681,6 +690,17 @@
                     document.getElementById('firebaseConfigInput').value = JSON.stringify(firebaseConfig, null, 2);
                 } else if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                     firebaseConfig = JSON.parse(__firebase_config);
+                } else {
+                    // Tự động dùng cấu hình Firebase đã tích hợp sẵn
+                    firebaseConfig = {
+                        apiKey: "AIzaSyDHTmYBvW2KVsqf_DSrlPLqLH5uA8ftgdI",
+                        authDomain: "canhi2026.firebaseapp.com",
+                        projectId: "canhi2026",
+                        storageBucket: "canhi2026.firebasestorage.app",
+                        messagingSenderId: "763116770789",
+                        appId: "1:763116770789:web:9a734f481eb28511ad4b0c",
+                        measurementId: "G-0MK7L6ZE4F"
+                    };
                 }
 
                 if (firebaseConfig) {
@@ -908,6 +928,25 @@
                 targetStudentCode = storedTarget;
                 document.getElementById('loginPortal').classList.add('hidden');
                 initDashboard();
+
+if (currentUserRole === 'admin' && currentAdminSquad !== 'all') {
+    const filter = document.getElementById('filterSquad');
+    if (filter) {
+      filter.value = currentAdminSquad;
+      filter.disabled = true;
+    }
+
+    const photoCategory = document.getElementById('photoCategory');
+    if (photoCategory) {
+      photoCategory.value = currentAdminSquad;
+      const options = document.querySelectorAll('#photoCategory option');
+      options.forEach(opt => {
+          if (opt.value !== currentAdminSquad) {
+              opt.style.display = 'none';
+          }
+      });
+    }
+}
             } else {
                 document.getElementById('loginPortal').classList.remove('hidden');
             }
@@ -1006,54 +1045,94 @@
         // Đăng nhập cho Phụ huynh
         window.submitParentLogin = function() {
             const studentCode = document.getElementById('parentStudentCode').value.trim().toUpperCase();
-            const generalCode = document.getElementById('parentGeneralCode').value.trim();
 
-            if (!studentCode && !generalCode) {
-                showToast("Lỗi nhập liệu", "Vui lòng nhập Mã số chiến sĩ hoặc Mã truy cập chung!", "error");
-                return;
-            }
+    if (!studentCode) {
+        showToast("Lỗi nhập liệu", "Vui lòng nhập Mã số chiến sĩ!", "error");
+        return;
+    }
 
-            if (studentCode) {
-                // Kiểm tra xem mã chiến sĩ có tồn tại trong danh sách không
-                const foundStudent = students.find(st => st.ma.toUpperCase() === studentCode);
-                if (foundStudent) {
-                    currentUserRole = 'parent_specific';
-                    targetStudentCode = studentCode;
-                    saveSessionToStorage();
-                    document.getElementById('loginPortal').classList.add('hidden');
-                    initDashboard();
-                    showToast("Xin chào phụ huynh!", `Chào mừng phụ huynh chiến sĩ ${foundStudent.ten} đã vào sổ đầu bài.`, "success");
-                } else {
-                    showToast("Không tìm thấy chiến sĩ", "Mã số chiến sĩ nhí này không đúng hoặc chưa được khởi tạo!", "error");
-                }
-            } else if (generalCode) {
-                if (generalCode === '2026') {
-                    currentUserRole = 'parent_general';
-                    targetStudentCode = null;
-                    saveSessionToStorage();
-                    document.getElementById('loginPortal').classList.add('hidden');
-                    initDashboard();
-                    showToast("Chào Phụ Huynh", "Đăng nhập thành công với mã truy cập đại đội chung.", "success");
-                } else {
-                    showToast("Sai mã truy cập", "Mã truy cập chung của Đại Đội không đúng!", "error");
-                }
-            }
-        }
+    const foundStudent = students.find(st => st.ma.toUpperCase() === studentCode);
+
+    if (foundStudent) {
+        currentUserRole = 'parent_specific';
+        targetStudentCode = studentCode;
+
+        saveSessionToStorage();
+
+        document.getElementById('loginPortal').classList.add('hidden');
+
+        initDashboard();
+
+        showToast(
+            "Xin chào phụ huynh!",
+            `Chào mừng phụ huynh chiến sĩ ${foundStudent.ten} đã vào sổ đầu bài.`,
+            "success"
+        );
+    } else {
+        showToast(
+            "Sai mã chiến sĩ",
+            "Không tìm thấy mã chiến sĩ trong hệ thống.",
+            "error"
+        );
+    }
+};
 
         // Đăng nhập cho Ban Chỉ Huy (Quản lý)
+const ADMIN_ACCOUNTS = {
+    "TD1": {
+        role: "admin",
+        squad: "1",
+        name: "Chỉ huy Tiểu đội 1"
+    },
+    "TD2": {
+        role: "admin",
+        squad: "2",
+        name: "Chỉ huy Tiểu đội 2"
+    },
+    "TD3": {
+        role: "admin",
+        squad: "3",
+        name: "Chỉ huy Tiểu đội 3"
+    },
+    "TONG": {
+        role: "super_admin",
+        squad: "all",
+        name: "Ban chỉ huy tổng"
+    }
+};
         window.submitAdminLogin = function() {
-            const code = document.getElementById('adminCode').value.trim();
-            if (code === '113') {
-                currentUserRole = 'admin';
-                targetStudentCode = null;
-                saveSessionToStorage();
-                document.getElementById('loginPortal').classList.add('hidden');
-                initDashboard();
-                showToast("Báo Cáo Sĩ Quan!", "Đăng nhập thành công quyền Quản lý & Nhận xét viên.", "success");
-            } else {
-                showToast("Sai mã sĩ quan", "Mã pin bảo mật của Ban chỉ huy không chính xác!", "error");
-            }
-        }
+    const code = document.getElementById('adminCode').value.trim().toUpperCase();
+
+    if (!ADMIN_ACCOUNTS[code]) {
+        showToast(
+            "Sai mã đăng nhập",
+            "Mã quản lý không hợp lệ.",
+            "error"
+        );
+        return;
+    }
+
+    const admin = ADMIN_ACCOUNTS[code];
+
+    currentUserRole = admin.role;
+    currentAdminSquad = admin.squad;
+    currentAdminName = admin.name;
+
+    localStorage.setItem('currentAdminSquad', currentAdminSquad);
+    localStorage.setItem('currentAdminName', currentAdminName);
+
+    saveSessionToStorage();
+
+    document.getElementById('loginPortal').classList.add('hidden');
+
+    initDashboard();
+
+    showToast(
+        "Đăng nhập thành công",
+        `${admin.name} đã đăng nhập hệ thống.`,
+        "success"
+    );
+};
 
         // Đăng xuất
         window.logOut = function() {
@@ -1563,6 +1642,9 @@
                 document.getElementById('modalMa').value = students[index].ma;
                 document.getElementById('modalTen').value = students[index].ten;
                 document.getElementById('modalTieuDoi').value = students[index].tieuDoi;
+
+                // Chỉ cho phép chỉnh sửa đúng ngày đang lọc ngoài bảng
+                document.getElementById('modalDay').disabled = true;
                 
                 // Tải dữ liệu tương ứng của ngày đang chọn
                 onModalDayChange();
@@ -1574,6 +1656,9 @@
                 document.getElementById('modalTieuDoi').value = "1";
                 document.getElementById('modalRating').value = "Tốt";
                 document.getElementById('modalNhanXet').value = "";
+
+                // Khi thêm mới học viên thì vẫn được chọn ngày mới
+                document.getElementById('modalDay').disabled = false;
             }
             modal.classList.remove('hidden');
         }
@@ -1596,6 +1681,7 @@
         }
 
         window.closeStudentModal = function() {
+            document.getElementById('modalDay').disabled = false;
             document.getElementById('studentModal').classList.add('hidden');
         }
 
@@ -1609,6 +1695,18 @@
             const selectedDay = document.getElementById('modalDay').value;
             const rating = document.getElementById('modalRating').value;
             const nhanXet = document.getElementById('modalNhanXet').value.trim();
+
+            // Phân quyền: chỉ quản lý đúng tiểu đội mới được nhận xét
+            if (currentUserRole === 'admin' && currentAdminSquad !== 'all') {
+                if (tieuDoi !== currentAdminSquad) {
+                    showToast(
+                        "Không có quyền",
+                        "Bạn chỉ được nhận xét chiến sĩ thuộc tiểu đội mình quản lý.",
+                        "error"
+                    );
+                    return;
+                }
+            }
 
             if (!ma || !ten || !nhanXet) {
                 showToast("Lỗi nhập thiếu", "Vui lòng điền đầy đủ Mã, Họ tên và Nhận xét!", "error");
@@ -1630,15 +1728,15 @@
                 showToast("Thành công", `Đã cập nhật nhận xét ${selectedDay} cho chiến sĩ ${ten}`, "success");
             } else {
                 // Tạo mới chiến sĩ hoàn toàn
-                const newStudent = {
+                const newReview = {
                     ma,
                     ten,
                     tieuDoi,
                     lichSu: {}
                 };
-                newStudent.lichSu[selectedDay] = { nhanXet, rating };
-                students.push(newStudent);
-                targetStudentObj = newStudent;
+                newReview.lichSu[selectedDay] = { nhanXet, rating };
+                students.push(newReview);
+                targetStudentObj = newReview;
                 showToast("Thêm mới", `Đã lưu danh chiến sĩ mới ${ten} vào sổ đầu bài`, "success");
             }
 
@@ -1690,6 +1788,18 @@
             const titleInput = document.getElementById('photoTitle');
             const categoryInput = document.getElementById('photoCategory');
             const descInput = document.getElementById('photoDesc');
+if (currentUserRole === 'admin' && currentAdminSquad !== 'all') {
+    const selectedCategory = document.getElementById('photoCategory').value;
+
+    if (selectedCategory !== currentAdminSquad) {
+        showToast(
+            "Không có quyền",
+            "Bạn chỉ được đăng ảnh cho tiểu đội của mình.",
+            "error"
+        );
+        return;
+    }
+}
 
             if (!fileInput.files[0]) {
                 showToast("Thiếu tệp tin", "Vui lòng đính kèm hình ảnh hoạt động!", "error");
@@ -1826,6 +1936,34 @@
         window.uploadLocalDataToCloud = uploadLocalDataToCloud;
         window.saveFirebaseConfig = saveFirebaseConfig;
         window.clearFirebaseConfig = clearFirebaseConfig;
+    
+</script>
+
+
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHTmYBvW2KVsqf_DSrlPLqLH5uA8ftgdI",
+            authDomain: "canhi2026.firebaseapp.com",
+            projectId: "canhi2026",
+            storageBucket: "canhi2026.firebasestorage.app",
+            messagingSenderId: "763116770789",
+            appId: "1:763116770789:web:9a734f481eb28511ad4b0c",
+            measurementId: "G-0MK7L6ZE4F"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+        window.firebaseApp = app;
     </script>
+
 </body>
 </html>
+<!-- Đã mở rộng hệ thống nhận xét lên 30 ngày -->
+
+<!-- Đã gộp học viên mới vào nhận xét mới -->
