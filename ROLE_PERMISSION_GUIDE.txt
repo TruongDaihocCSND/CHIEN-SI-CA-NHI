@@ -1,0 +1,24 @@
+
+/*
+========================================
+ROLE CONFIG PLACEHOLDER
+========================================
+
+tong_chi_huy
+=> Toàn quyền quản trị
+
+ban_chi_huy_tieu_doi
+=> Chỉ xem + cập nhật dữ liệu
+
+========================================
+EXAMPLE:
+========================================
+
+if(user.role === 'tong_chi_huy'){
+   // full access
+}
+
+if(user.role === 'ban_chi_huy_tieu_doi'){
+   // limited access
+}
+*/

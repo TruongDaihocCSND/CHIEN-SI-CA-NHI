@@ -1,0 +1,35 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ===============================
+       USER ROLE STRUCTURE
+       ===============================
+
+       users/{uid}
+       {
+         role: "tong_chi_huy" | "ban_chi_huy_tieu_doi"
+       }
+
+    */
+
+    /* ===============================
+       CLOUD STORAGE DATA
+       =============================== */
+
+    match /cloud_storage/{document=**} {
+
+      // Ban chỉ huy tổng: toàn quyền
+      allow read, write, delete: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        == "tong_chi_huy";
+
+      // Ban chỉ huy tiểu đội:
+      // chỉ được xem + cập nhật thêm
+      allow read, create, update: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        == "ban_chi_huy_tieu_doi";
+    }
+  }
+}
